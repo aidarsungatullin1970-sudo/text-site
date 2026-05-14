@@ -1,71 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>АТЕКС</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1c2c;
-      color: white;
-      text-align: center;
-    }
+<meta charset="UTF-8">
+<title>Разбор текста</title>
 
-    .container {
-      padding: 40px 20px;
-    }
+<style>
+body {
+    font-family: Arial;
+    background: #F8F9FB;
+    color: #111;
+    margin: 0;
+}
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
+.container {
+    max-width: 600px;
+    margin: auto;
+    padding: 30px;
+}
 
-    p {
-      font-size: 18px;
-      opacity: 0.8;
-    }
+h1 {
+    font-size: 28px;
+}
 
-    .btn {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 15px 25px;
-      background: #00bcd4;
-      color: #000;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 8px;
-    }
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+}
 
-    .card {
-      background: #122b40;
-      margin-top: 40px;
-      padding: 20px;
-      border-radius: 12px;
-    }
+button {
+    background: #2EC4B6;
+    color: white;
+    padding: 15px;
+    border: none;
+    margin-top: 10px;
+    width: 100%;
+}
 
-  </style>
+.result {
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+}
+</style>
+
 </head>
+
 <body>
 
-  <div class="container">
-    <h1>АТЕКС</h1>
-    <p>Простые решения для сложных задач</p>
+<div class="container">
 
-    <a href="#" class="btn">Оставить заявку</a>
+<h1>Проверь свой текст</h1>
 
-    <div class="card">
-      <h2>Что мы делаем</h2>
-      <p>Помогаем запускать сайты и получать заявки быстро и без лишнего.</p>
-    </div>
+<p>Вставь текст и посмотри, где он перегружен</p>
 
-    <div class="card">
-      <h2>Почему мы</h2>
-      <p>Минимум слов — максимум результата.</p>
-    </div>
+<textarea id="text"></textarea>
 
-  </div>
+<button onclick="analyze()">Разобрать текст</button>
+
+<div id="result" class="result"></div>
+
+</div>
+
+<script>
+function analyze() {
+    let text = document.getElementById("text").value;
+
+    if (!text) {
+        alert("Вставь текст");
+        return;
+    }
+
+    document.getElementById("result").innerHTML =
+    "🔍 Анализ:<br><br>" +
+    "1. Есть перегруз<br>" +
+    "2. Есть сложные формулировки<br>" +
+    "3. Местами теряется мысль<br><br>" +
+    "👉 Полный разбор покажет точные места<br><br>" +
+    "<a href='https://t.me/ТВОЙ_НИК'>👉 Получить полный разбор</a>";
+}
+</script>
 
 </body>
 </html>
