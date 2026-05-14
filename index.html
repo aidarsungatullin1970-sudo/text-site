@@ -2,68 +2,86 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Разбор текста</title>
+<title>Анализ текста</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #F8F9FB;
-    color: #111;
-    margin: 0;
-}
-
-.container {
-    max-width: 600px;
-    margin: auto;
+    background: #0b1c2c;
+    color: white;
+    text-align: center;
     padding: 30px;
 }
 
-h1 {
-    font-size: 28px;
-}
-
 textarea {
-    width: 100%;
+    width: 80%;
     height: 150px;
     padding: 10px;
 }
 
 button {
-    background: #2EC4B6;
-    color: white;
-    padding: 15px;
+    margin: 10px;
+    padding: 12px 20px;
     border: none;
-    margin-top: 10px;
-    width: 100%;
+    cursor: pointer;
 }
 
-.result {
+.ai { background: #00c2ff; }
+.limit { background: #ff4d4d; }
+
+#result {
     margin-top: 20px;
     background: white;
-    padding: 15px;
+    color: black;
+    padding: 20px;
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
-
-<h1>Проверь свой текст</h1>
-
-<p>Вставь текст и посмотри, где он перегружен</p>
+<h1>Проверь и усили свой текст</h1>
 
 <textarea id="text"></textarea>
+<br>
 
-<button onclick="analyze()">Разобрать текст</button>
+<button onclick="analyzeText()">Анализ</button>
+<button class="ai" onclick="askAI()">Сделать лучше (ИИ)</button>
 
-<div id="result" class="result"></div>
+<div id="result"></div>
 
-</div>
+<p id="limitInfo"></p>
 
 <script>
-function analyze() {
+
+// ====== ЛИМИТЫ ======
+let limit = localStorage.getItem("limit") || 3;
+
+function updateLimit() {
+    document.getElementById("limitInfo").innerHTML =
+        "Осталось попыток: " + limit;
+}
+updateLimit();
+
+
+// ====== АНАЛИЗ ======
+function analyzeText() {
+    let text = document.getElementById("text").value;
+
+    let result = "<h3>🔍 Анализ:</h3>";
+
+    if (text.length > 200) {
+        result += "<p>❌ Перегружен</p>";
+    } else {
+        result += "<p>✅ Норм</p>";
+    }
+
+    document.getElementById("result").innerHTML = result;
+}
+
+
+// ====== ИИ ======
+async function askAI() {
     let text = document.getElementById("text").value;
 
     if (!text) {
@@ -71,15 +89,54 @@ function analyze() {
         return;
     }
 
+    if (limit <= 0) {
+        document.getElementById("result").innerHTML =
+            "<h3>❌ Лимит закончился</h3><p>Купите доступ</p>";
+        return;
+    }
+
+    limit--;
+    localStorage.setItem("limit", limit);
+    updateLimit();
+
+    document.getElementById("result").innerHTML = "⏳ Думаю...";
+
+    let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer ТВОЙ_API_КЛЮЧ",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "openai/gpt-4o-mini",
+            messages: [
+                {
+                    role: "user",
+                    content: "Сделай текст проще, сильнее и понятнее: " + text
+                }
+            ]
+        })
+    });
+
+    let data = await response.json();
+
+    let answer = data.choices[0].message.content;
+
     document.getElementById("result").innerHTML =
-    "🔍 Анализ:<br><br>" +
-    "1. Есть перегруз<br>" +
-    "2. Есть сложные формулировки<br>" +
-    "3. Местами теряется мысль<br><br>" +
-    "👉 Полный разбор покажет точные места<br><br>" +
-    "<a href='https://t.me/ТВОЙ_НИК'>👉 Получить полный разбор</a>";
+        "<h3>🤖 ИИ ответ:</h3><p>" + answer + "</p>";
 }
+
+
+// ====== КНОПКА ПРОДАЖИ ======
+function buyAccess() {
+    window.location.href = "https://t.me/your_telegram";
+}
+
 </script>
+
+<br>
+
+<button class="limit" onclick="buyAccess()">Купить доступ</button>
 
 </body>
 </html>
