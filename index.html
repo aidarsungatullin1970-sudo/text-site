@@ -46,9 +46,9 @@ button {
 <br>
 
 <button onclick="analyzeText()">Анализ</button>
-<button class="ai" onclick="askAI()">Сделать лучше (ИИ)</button>
-
+<button class="ai" onclick="improveText()">Сделать лучше (ИИ)</button>
 <div id="result"></div>
+
 
 <p id="limitInfo"></p>
 
@@ -137,6 +137,31 @@ function buyAccess() {
 <br>
 
 <button class="limit" onclick="buyAccess()">Купить доступ</button>
+<script>
+async function improveText() {
+    const text = document.querySelector("textarea").value;
 
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": "Bearer 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",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "openai/gpt-4o-mini",
+            messages: [
+                {
+                    role: "user",
+                    content: "Сделай текст сильнее и понятнее:\n\n" + text
+                }
+            ]
+        })
+    });
+
+    const data = await response.json();
+    document.getElementById("result").innerText =
+        data.choices[0].message.content;
+}
+</script>
 </body>
 </html>
