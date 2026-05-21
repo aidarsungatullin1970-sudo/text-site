@@ -21,19 +21,15 @@ textarea {
 
 button {
     margin: 10px;
-    padding: 12px 20px;
-    border: none;
+    padding: 10px 20px;
     cursor: pointer;
 }
-
-.ai { background: #00c2ff; }
-.limit { background: #ff4d4d; }
 
 #result {
     margin-top: 20px;
     background: white;
     color: black;
-    padding: 20px;
+    padding: 15px;
 }
 </style>
 </head>
@@ -42,126 +38,52 @@ button {
 
 <h1>Проверь и усили свой текст</h1>
 
-<textarea id="text"></textarea>
-<br>
+<textarea id="inputText" placeholder="Вставь текст..."></textarea><br>
 
-<button onclick="analyzeText()">Анализ</button>
-<button class="ai" onclick="improveText()">Сделать лучше (ИИ)</button>
+<button onclick="improveText()">Сделать лучше (ИИ)</button>
+
 <div id="result"></div>
 
-
-<p id="limitInfo"></p>
-
-<script>
-
-// ====== ЛИМИТЫ ======
-let limit = localStorage.getItem("limit") || 3;
-
-function updateLimit() {
-    document.getElementById("limitInfo").innerHTML =
-        "Осталось попыток: " + limit;
-}
-updateLimit();
-
-
-// ====== АНАЛИЗ ======
-function analyzeText() {
-    let text = document.getElementById("text").value;
-
-    let result = "<h3>🔍 Анализ:</h3>";
-
-    if (text.length > 200) {
-        result += "<p>❌ Перегружен</p>";
-    } else {
-        result += "<p>✅ Норм</p>";
-    }
-
-    document.getElementById("result").innerHTML = result;
-}
-
-
-// ====== ИИ ======
-async function askAI() {
-    let text = document.getElementById("text").value;
-
-    if (!text) {
-        alert("Вставь текст");
-        return;
-    }
-
-    if (limit <= 0) {
-        document.getElementById("result").innerHTML =
-            "<h3>❌ Лимит закончился</h3><p>Купите доступ</p>";
-        return;
-    }
-
-    limit--;
-    localStorage.setItem("limit", limit);
-    updateLimit();
-
-    document.getElementById("result").innerHTML = "⏳ Думаю...";
-
-    let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer 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",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "openai/gpt-4o-mini",
-            messages: [
-                {
-                    role: "user",
-                    content: "Сделай текст проще, сильнее и понятнее: " + text
-                }
-            ]
-        })
-    });
-
-    let data = await response.json();
-
-    let answer = data.choices[0].message.content;
-
-    document.getElementById("result").innerHTML =
-        "<h3>🤖 ИИ ответ:</h3><p>" + answer + "</p>";
-}
-
-
-// ====== КНОПКА ПРОДАЖИ ======
-function buyAccess() {
-    window.location.href = "https://t.me/your_telegram";
-}
-
-</script>
-
-<br>
-
-<button class="limit" onclick="buyAccess()">Купить доступ</button>
 <script>
 async function improveText() {
-    const text = document.querySelector("textarea").value;
+    let text = document.getElementById("inputText").value;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer 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",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            model: "openai/gpt-4o-mini",
-            messages: [
-                {
-                    role: "user",
-                    content: "Сделай текст сильнее и понятнее:\n\n" + text
-                }
-            ]
-        })
-    });
+    document.getElementById("result").innerText = "Думаю...";
 
-    const data = await response.json();
-    document.getElementById("result").innerText =
-        data.choices[0].message.content;
+    try {
+        let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer sk-or-v1-ВСТАВЬ_СЮДА_КЛЮЧ",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "openai/gpt-4o-mini",
+                messages: [
+                    {
+                        role: "user",
+                        content: "Сделай текст проще, сильнее и понятнее:\n\n" + text
+                    }
+                ]
+            })
+        });
+
+        let data = await response.json();
+
+        if (data.choices && data.choices.length > 0) {
+            document.getElementById("result").innerText =
+                data.choices[0].message.content;
+        } else {
+            document.getElementById("result").innerText =
+                "Ошибка: нет ответа от ИИ";
+        }
+
+    } catch (error) {
+        document.getElementById("result").innerText =
+            "Ошибка запроса: " + error;
+    }
 }
 </script>
+
 </body>
 </html>
