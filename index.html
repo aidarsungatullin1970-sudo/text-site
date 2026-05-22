@@ -6,30 +6,30 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: #0b1c2c;
-    color: white;
-    text-align: center;
-    padding: 30px;
+  font-family: Arial;
+  background: #0b1c2c;
+  color: white;
+  text-align: center;
+  padding: 30px;
 }
 
 textarea {
-    width: 80%;
-    height: 150px;
-    padding: 10px;
+  width: 80%;
+  height: 150px;
+  padding: 10px;
 }
 
 button {
-    margin: 10px;
-    padding: 10px 20px;
-    cursor: pointer;
+  margin: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
 #result {
-    margin-top: 20px;
-    background: white;
-    color: black;
-    padding: 15px;
+  margin-top: 20px;
+  background: #eee;
+  color: black;
+  padding: 20px;
 }
 </style>
 </head>
@@ -38,7 +38,7 @@ button {
 
 <h1>Проверь и усили свой текст</h1>
 
-<textarea id="inputText" placeholder="Вставь текст..."></textarea><br>
+<textarea id="text" placeholder="Вставь текст сюда..."></textarea><br>
 
 <button onclick="improveText()">Сделать лучше (ИИ)</button>
 
@@ -46,42 +46,33 @@ button {
 
 <script>
 async function improveText() {
-    let text = document.getElementById("inputText").value;
+  const text = document.getElementById("text").value;
 
-    document.getElementById("result").innerText = "Думаю...";
+  if (!text) {
+    alert("Вставь текст");
+    return;
+  }
 
-    try {
-        let response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer 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",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "openai/gpt-4o-mini",
-                messages: [
-                    {
-                        role: "user",
-                        content: "Сделай текст проще, сильнее и понятнее:\n\n" + text
-                    }
-                ]
-            })
-        });
+  document.getElementById("result").innerText = "Думаю...";
 
-        let data = await response.json();
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ text })
+    });
 
-        if (data.choices && data.choices.length > 0) {
-            document.getElementById("result").innerText =
-                data.choices[0].message.content;
-        } else {
-            document.getElementById("result").innerText =
-                "Ошибка: нет ответа от ИИ";
-        }
+    const data = await response.json();
 
-    } catch (error) {
-        document.getElementById("result").innerText =
-            "Ошибка запроса: " + error;
-    }
+    document.getElementById("result").innerText =
+      data.result || "Ошибка: нет ответа";
+
+  } catch (error) {
+    document.getElementById("result").innerText =
+      "Ошибка запроса";
+  }
 }
 </script>
 
